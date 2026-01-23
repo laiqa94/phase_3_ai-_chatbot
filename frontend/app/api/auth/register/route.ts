@@ -18,6 +18,7 @@ export async function POST(req: Request) {
 
     // Proxy to backend
     const backendUrl = `${baseUrl()}/api/v1/auth/register`;
+    console.log("Attempting to connect to backend at:", backendUrl); // For debugging
 
     const response = await fetch(backendUrl, {
       method: 'POST',
@@ -27,15 +28,31 @@ export async function POST(req: Request) {
       body: JSON.stringify(body),
     });
 
+    console.log("Backend responded with status:", response.status); // For debugging
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ message: 'Backend error' }));
+      console.log("Backend error response:", errorData); // For debugging
       return NextResponse.json(errorData, { status: response.status });
     }
 
     const data = await response.json();
+    console.log("Backend success response:", data); // For debugging
     return NextResponse.json(data);
   } catch (error) {
     console.error("Register error:", error);
+    // Check if it's a network error
+    if (error instanceof TypeError && error.message.includes('fetch failed')) {
+      console.error("Network error: Could not connect to backend server");
+      return NextResponse.json(
+        {
+          message: "Could not connect to backend server. Please ensure the backend is running on the configured API_BASE_URL.",
+          error: String(error),
+          backend_url: `${baseUrl()}/api/v1/auth/register`
+        },
+        { status: 500 }
+      );
+    }
     return NextResponse.json(
       { message: "Registration failed", error: String(error) },
       { status: 500 }

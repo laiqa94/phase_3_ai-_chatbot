@@ -12,7 +12,7 @@ export default async function DashboardPage() {
   });
 
   const total = tasks.length;
-  const completed = tasks.filter((t) => t.status === "completed").length;
+  const completed = tasks.filter((t) => t.completed).length;
   const active = total - completed;
 
   return (

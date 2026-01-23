@@ -38,8 +38,8 @@ export function TasksClient({
   const visibleTasks = useMemo(() => {
     const status = initialStatus === "all" ? "" : initialStatus;
     return tasks.filter((t) => {
-      if (status === "completed" && t.status !== "completed") return false;
-      if (status === "pending" && t.status !== "pending") return false;
+      if (status === "completed" && !t.completed) return false;
+      if (status === "pending" && t.completed) return false;
       if (initialQuery && initialQuery.trim()) {
         const q = initialQuery.trim().toLowerCase();
         const hay = `${t.title} ${t.description ?? ""}`.toLowerCase();
@@ -96,7 +96,8 @@ export function TasksClient({
       description: draft.description,
       dueDate: draft.dueDate,
       priority: draft.priority,
-      status: "pending",
+      completed: false,
+      ownerId: 0, // Placeholder value for optimistic update
     };
 
     setTasks((prev) => [optimistic, ...prev]);
@@ -114,16 +115,16 @@ export function TasksClient({
     }
   }
 
-  async function toggleComplete(taskId: string, nextCompleted: boolean) {
+  async function toggleComplete(taskId: number | string, nextCompleted: boolean) {
     const prev = tasks;
     setTasks((list) =>
       list.map((t) =>
-        t.id === taskId ? { ...t, status: nextCompleted ? "completed" : "pending" } : t,
+        t.id === taskId ? { ...t, completed: nextCompleted } : t,
       ),
     );
 
     try {
-      const updated = await apiFetch<Task>(`/api/proxy/api/me/tasks/${encodeURIComponent(taskId)}/complete`, {
+      const updated = await apiFetch<Task>(`/api/proxy/api/me/tasks/${taskId}/complete`, {
         method: "PATCH",
         body: { completed: nextCompleted },
       });
@@ -134,7 +135,7 @@ export function TasksClient({
     }
   }
 
-  async function deleteTask(taskId: string) {
+  async function deleteTask(taskId: number | string) {
     const prev = tasks;
     setTasks((list) => list.filter((t) => t.id !== taskId));
 

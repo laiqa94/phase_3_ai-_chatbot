@@ -9,11 +9,11 @@ export function TaskCard({
   onDelete,
 }: {
   task: Task;
-  onToggleComplete?: (taskId: string, nextCompleted: boolean) => void;
+  onToggleComplete?: (taskId: number | string, nextCompleted: boolean) => void;
   onEdit?: (task: Task) => void;
-  onDelete?: (taskId: string) => void;
+  onDelete?: (taskId: number | string) => void;
 }) {
-  const isCompleted = task.status === "completed";
+  const isCompleted = task.completed;
 
   return (
     <div className="rounded-lg border border-zinc-200 bg-white p-4">

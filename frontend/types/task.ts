@@ -1,14 +1,13 @@
-export type TaskStatus = "pending" | "completed";
-
 export type Task = {
-  id: string;
+  id: number | string; // Backend returns number, but keeping flexibility
   title: string;
   description?: string;
-  status: TaskStatus;
-  dueDate?: string;
-  priority?: string;
+  completed: boolean; // Backend returns 'completed' as boolean
+  ownerId: number;
   createdAt?: string;
   updatedAt?: string;
+  dueDate?: string;
+  priority?: string;
   metadata?: Record<string, unknown>;
   labels?: string[];
 };
