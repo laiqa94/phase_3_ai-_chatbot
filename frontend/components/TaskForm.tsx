@@ -55,54 +55,65 @@ export function TaskForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-lg border border-zinc-200 bg-white p-4">
-      <div className="grid gap-3 sm:grid-cols-2">
+    <form onSubmit={handleSubmit} className="rounded-lg border border-zinc-200 bg-white p-4 sm:p-6 shadow-sm">
+      <div className="grid gap-4 sm:gap-3">
+        {/* Title - Full width on mobile */}
         <label className="grid gap-1">
           <span className="text-sm font-medium text-zinc-700">Title</span>
           <input
             value={draft.title}
             onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))}
-            className="h-10 rounded-md border border-zinc-200 px-3"
+            className="h-10 sm:h-11 rounded-md border border-zinc-200 px-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="e.g., Pay rent"
           />
         </label>
 
-        <label className="grid gap-1">
-          <span className="text-sm font-medium text-zinc-700">Due date</span>
-          <input
-            type="date"
-            value={draft.dueDate ?? ""}
-            onChange={(e) => setDraft((d) => ({ ...d, dueDate: e.target.value }))}
-            className="h-10 rounded-md border border-zinc-200 px-3"
-          />
-        </label>
+        {/* Due date and Priority - Stack on mobile, side by side on desktop */}
+        <div className="grid gap-4 sm:gap-3 sm:grid-cols-2">
+          <label className="grid gap-1">
+            <span className="text-sm font-medium text-zinc-700">Due date</span>
+            <input
+              type="date"
+              value={draft.dueDate ?? ""}
+              onChange={(e) => setDraft((d) => ({ ...d, dueDate: e.target.value }))}
+              className="h-10 sm:h-11 rounded-md border border-zinc-200 px-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </label>
 
-        <label className="grid gap-1 sm:col-span-2">
+          <label className="grid gap-1">
+            <span className="text-sm font-medium text-zinc-700">Priority</span>
+            <select
+              value={draft.priority ?? ""}
+              onChange={(e) => setDraft((d) => ({ ...d, priority: e.target.value }))}
+              className="h-10 sm:h-11 rounded-md border border-zinc-200 px-3 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+            >
+              <option value="">Select priority</option>
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </label>
+        </div>
+
+        {/* Description - Full width */}
+        <label className="grid gap-1">
           <span className="text-sm font-medium text-zinc-700">Description</span>
           <textarea
             value={draft.description ?? ""}
             onChange={(e) => setDraft((d) => ({ ...d, description: e.target.value }))}
-            className="min-h-24 rounded-md border border-zinc-200 px-3 py-2"
+            className="min-h-20 sm:min-h-24 rounded-md border border-zinc-200 px-3 py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y"
             placeholder="Optional details"
+            rows={3}
           />
         </label>
 
-        <label className="grid gap-1">
-          <span className="text-sm font-medium text-zinc-700">Priority</span>
-          <input
-            value={draft.priority ?? ""}
-            onChange={(e) => setDraft((d) => ({ ...d, priority: e.target.value }))}
-            className="h-10 rounded-md border border-zinc-200 px-3"
-            placeholder="Optional"
-          />
-        </label>
-
-        <div className="flex items-end justify-end gap-2">
+        {/* Buttons - Stack on mobile, inline on desktop */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3 pt-2">
           {onCancel ? (
             <button
               type="button"
               onClick={onCancel}
-              className="h-10 rounded-md border border-zinc-200 px-4 text-zinc-700 hover:bg-zinc-50"
+              className="h-10 sm:h-11 rounded-md border border-zinc-200 px-4 text-sm sm:text-base text-zinc-700 hover:bg-zinc-50 transition-colors order-2 sm:order-1"
             >
               Cancel
             </button>
@@ -110,14 +121,25 @@ export function TaskForm({
           <button
             disabled={submitting}
             type="submit"
-            className="h-10 rounded-md bg-zinc-900 px-4 text-white hover:bg-zinc-800 disabled:opacity-60"
+            className="h-10 sm:h-11 rounded-md bg-zinc-900 px-4 text-sm sm:text-base text-white hover:bg-zinc-800 disabled:opacity-60 transition-colors order-1 sm:order-2 font-medium"
           >
-            {mode === "create" ? "Add task" : "Save"}
+            {submitting ? (
+              <div className="flex items-center justify-center gap-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                {mode === "create" ? "Adding..." : "Saving..."}
+              </div>
+            ) : (
+              mode === "create" ? "Add task" : "Save"
+            )}
           </button>
         </div>
       </div>
 
-      {error ? <p className="mt-3 text-sm text-red-600">{error}</p> : null}
+      {error ? (
+        <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-md">
+          <p className="text-sm text-red-600">{error}</p>
+        </div>
+      ) : null}
     </form>
   );
 }

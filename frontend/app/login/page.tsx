@@ -17,9 +17,11 @@ type LoginResponse = {
 
 export default function LoginPage() {
   return (
-    <Suspense>
-      <LoginForm />
-    </Suspense>
+    <div className="min-h-screen bg-pattern flex items-center justify-center p-4">
+      <Suspense>
+        <LoginForm />
+      </Suspense>
+    </div>
   );
 }
 
@@ -79,50 +81,73 @@ function LoginForm() {
   return (
     <ParamsClient>
       {(next) => (
-        <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-4">
-          <h1 className="text-2xl font-semibold text-zinc-900">Sign in</h1>
-          <p className="mt-1 text-sm text-zinc-600">Welcome back.</p>
+        <div className="w-full max-w-md">
+          <div className="glass-effect rounded-2xl p-8 shadow-2xl">
+            <div className="text-center mb-6">
+              <h1 className="text-3xl font-bold text-white mb-2">Welcome Back</h1>
+              <p className="text-white/80">Sign in to your account</p>
+            </div>
 
-          <form onSubmit={(e) => onSubmit(e, next)} className="mt-6 grid gap-3">
-            <label className="grid gap-1">
-              <span className="text-sm font-medium text-zinc-700">Email</span>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="h-10 rounded-md border border-zinc-200 px-3"
-                autoComplete="email"
-              />
-            </label>
+            <form onSubmit={(e) => onSubmit(e, next)} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-white/90 mb-2">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full h-12 rounded-lg border border-white/20 bg-white/10 px-4 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent backdrop-blur-sm"
+                  placeholder="Enter your email"
+                  autoComplete="email"
+                />
+              </div>
 
-            <label className="grid gap-1">
-              <span className="text-sm font-medium text-zinc-700">Password</span>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="h-10 rounded-md border border-zinc-200 px-3"
-                autoComplete="current-password"
-              />
-            </label>
+              <div>
+                <label className="block text-sm font-medium text-white/90 mb-2">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full h-12 rounded-lg border border-white/20 bg-white/10 px-4 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent backdrop-blur-sm"
+                  placeholder="Enter your password"
+                  autoComplete="current-password"
+                />
+              </div>
 
-            <button
-              type="submit"
-              disabled={submitting}
-              className="mt-2 h-10 rounded-md bg-zinc-900 px-4 text-white hover:bg-zinc-800 disabled:opacity-60"
-            >
-              {submitting ? "Signing in…" : "Sign in"}
-            </button>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full h-12 rounded-lg bg-white/20 text-white font-medium hover:bg-white/30 disabled:opacity-50 transition-all duration-200 backdrop-blur-sm border border-white/30 mt-6"
+              >
+                {submitting ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Signing in...
+                  </div>
+                ) : (
+                  "Sign in"
+                )}
+              </button>
 
-            {error ? <p className="text-sm text-red-600">{error}</p> : null}
-          </form>
+              {error ? (
+                <div className="mt-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
+                  <p className="text-sm text-red-200">{error}</p>
+                </div>
+              ) : null}
+            </form>
 
-          <p className="mt-6 text-sm text-zinc-600">
-            No account?{" "}
-            <Link className="text-zinc-900 underline" href="/register">
-              Create one
-            </Link>
-          </p>
+            <div className="mt-6 text-center">
+              <p className="text-white/80 text-sm">
+                Don't have an account?{" "}
+                <Link className="text-white font-medium hover:underline" href="/register">
+                  Create one
+                </Link>
+              </p>
+            </div>
+          </div>
         </div>
       )}
     </ParamsClient>

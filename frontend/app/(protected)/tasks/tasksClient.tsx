@@ -172,10 +172,11 @@ export function TasksClient({
   }
 
   return (
-    <div className="grid gap-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-zinc-900">Tasks</h1>
+    <div className="space-y-4 sm:space-y-6">
+      {/* Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="text-center sm:text-left">
+          <h1 className="text-xl sm:text-2xl font-semibold text-zinc-900">Tasks</h1>
           <p className="mt-1 text-sm text-zinc-600">Create and manage your tasks.</p>
         </div>
 
@@ -185,9 +186,9 @@ export function TasksClient({
         />
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-3">
-        <label className="sm:col-span-2">
-          <span className="sr-only">Search</span>
+      {/* Search */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex-1">
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -195,18 +196,19 @@ export function TasksClient({
               if (e.key === "Enter") updateUrl({ status: initialStatus, q: query });
             }}
             placeholder="Search tasks…"
-            className="h-10 w-full rounded-md border border-zinc-200 bg-white px-3"
+            className="w-full h-10 sm:h-11 rounded-lg border border-zinc-200 bg-white/80 backdrop-blur-sm px-3 sm:px-4 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
-        </label>
+        </div>
         <button
           type="button"
           onClick={() => updateUrl({ status: initialStatus, q: query })}
-          className="h-10 rounded-md bg-zinc-900 px-4 text-white hover:bg-zinc-800"
+          className="h-10 sm:h-11 rounded-lg bg-zinc-900 px-4 sm:px-6 text-sm sm:text-base text-white hover:bg-zinc-800 transition-colors font-medium"
         >
           Search
         </button>
       </div>
 
+      {/* Task Form */}
       <TaskForm
         mode={editing ? "edit" : "create"}
         initialValues={
@@ -223,6 +225,7 @@ export function TasksClient({
         onCancel={editing ? () => setEditing(null) : undefined}
       />
 
+      {/* Task List */}
       <TaskList
         tasks={visibleTasks}
         onToggleComplete={toggleComplete}
