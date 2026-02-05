@@ -3,9 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 
-import type { User } from "@/types/user";
-
-export function Navbar({ user }: { user?: User }) {
+export function Navbar({ user }: { user?: any }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   async function logout() {
@@ -14,27 +12,26 @@ export function Navbar({ user }: { user?: User }) {
   }
 
   return (
-    <header className="glass-effect border-b border-white/20">
-      <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
-        <Link href="/dashboard" className="font-bold text-white text-xl floating">
-          ✨ Todo
+    <header className="bg-white shadow-sm border-b">
+      <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
+        <Link href="/dashboard" className="font-bold text-gray-900 text-xl">
+          📝 Todo App
         </Link>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-6 text-sm">
-          <Link href="/tasks" className="text-white/80 hover:text-white transition-colors duration-300 hover:scale-105">
+        <nav className="hidden md:flex items-center gap-6">
+          <Link href="/tasks" className="text-gray-600 hover:text-gray-900">
             Tasks
           </Link>
 
           {user ? (
             <div className="flex items-center gap-4">
-              <span className="hidden lg:inline text-white/80 max-w-32 truncate">
-                {user.displayName ?? user.email}
+              <span className="text-gray-600 text-sm">
+                {user.displayName || user.email}
               </span>
               <button
                 type="button"
                 onClick={() => void logout()}
-                className="glass-button rounded-lg px-4 py-2 text-white font-medium"
+                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
               >
                 Logout
               </button>
@@ -42,19 +39,17 @@ export function Navbar({ user }: { user?: User }) {
           ) : (
             <Link
               href="/login"
-              className="glass-button rounded-lg px-4 py-2 text-white font-medium"
+              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
             >
               Login
             </Link>
           )}
         </nav>
 
-        {/* Mobile Menu Button */}
         <button
           type="button"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="md:hidden p-2 rounded-lg glass-button text-white"
-          aria-label="Toggle menu"
+          className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             {isMenuOpen ? (
@@ -66,13 +61,12 @@ export function Navbar({ user }: { user?: User }) {
         </button>
       </div>
 
-      {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="md:hidden border-t border-white/20 glass-effect">
+        <div className="md:hidden border-t bg-white">
           <nav className="px-4 py-4 space-y-4">
             <Link 
               href="/tasks" 
-              className="block text-white/80 hover:text-white transition-colors duration-300"
+              className="block text-gray-600 hover:text-gray-900"
               onClick={() => setIsMenuOpen(false)}
             >
               Tasks
@@ -80,13 +74,13 @@ export function Navbar({ user }: { user?: User }) {
             
             {user ? (
               <div className="space-y-4">
-                <div className="text-sm text-white/70 truncate">
-                  {user.displayName ?? user.email}
+                <div className="text-sm text-gray-600">
+                  {user.displayName || user.email}
                 </div>
                 <button
                   type="button"
                   onClick={() => void logout()}
-                  className="block w-full text-left glass-button rounded-lg px-4 py-3 text-white font-medium"
+                  className="block w-full text-left bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
                 >
                   Logout
                 </button>
@@ -94,7 +88,7 @@ export function Navbar({ user }: { user?: User }) {
             ) : (
               <Link
                 href="/login"
-                className="block glass-button rounded-lg px-4 py-3 text-white font-medium"
+                className="block bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Login
