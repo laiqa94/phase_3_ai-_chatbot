@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { Navbar } from "@/components/Navbar";
-import { ClientWrapper } from "@/components/ClientWrapper";
+import ClientWrapper from "@/components/ClientWrapper";
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
