@@ -1,22 +1,45 @@
-import { redirect } from "next/navigation";
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { Navbar } from "@/components/Navbar";
-import { getSessionServer } from "@/lib/auth";
-import Chatbot from "@/components/Chatbot";
+import { ClientWrapper } from "@/components/ClientWrapper";
 
-export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
-  const session = await getSessionServer();
-  if (!session) redirect("/login");
+export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    // Mock user session for now
+    const mockUser = {
+      id: "1",
+      email: "user@example.com",
+      displayName: "User"
+    };
+    
+    setUser(mockUser);
+    setLoading(false);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div>Loading...</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-pattern">
-      <Navbar user={session.user} />
+    <div className="min-h-screen bg-gray-50">
+      <Navbar user={user} />
       <main className="mx-auto max-w-5xl px-4 py-6">
-        <div className="glass-effect rounded-2xl p-6 shadow-2xl">
+        <div className="bg-white rounded-lg shadow p-6">
           {children}
         </div>
       </main>
-      {session.user?.id && <Chatbot userId={Number(session.user.id)} />}
+      <ClientWrapper />
     </div>
   );
 }
