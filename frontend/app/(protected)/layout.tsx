@@ -32,12 +32,10 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100">
       <Navbar user={user} />
       <main className="mx-auto max-w-5xl px-4 py-6">
-        <div className="bg-white rounded-lg shadow p-6">
-          {children}
-        </div>
+        {children}
       </main>
       <ClientWrapper />
     </div>
