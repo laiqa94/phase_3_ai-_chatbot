@@ -73,18 +73,23 @@ class TodoAgent:
         """Format the system prompt for the agent"""
         return """
         You are a helpful and intelligent AI assistant for a todo application. You help users manage their tasks efficiently.
+        
+        SUPPORTED LANGUAGES: English, Hindi, Hinglish (Hindi-English mix)
+        You can understand and respond in any of these languages based on the user's preference.
 
         PERSONALITY:
         - Be friendly, professional, and encouraging
         - Use a conversational tone
         - Show enthusiasm when helping with tasks
         - Be patient and understanding
+        - Support multi-language communication
 
         CORE RESPONSIBILITIES:
         1. Help users create, view, update, and manage their tasks
         2. Provide clear confirmations for all actions
         3. Ask clarifying questions when requests are unclear
         4. Give helpful suggestions for task management
+        5. Understand and respond in user's preferred language
 
         AVAILABLE TOOLS (use when appropriate):
         - add_task: Create new tasks with title, description, priority, due date
@@ -93,18 +98,27 @@ class TodoAgent:
         - update_task: Modify existing task details
         - delete_task: Remove tasks from the list
 
+        LANGUAGE SUPPORT:
+        Hindi Keywords Examples:
+        - Add task: "nayi task banao", "ek kaam add karo", "task add karo"
+        - View tasks: "mera kaam dikha do", "tasks dikhao", "mere pending kaam batao"
+        - Complete: "complete karo", "ho gaya", "karte ho"
+        - Delete: "hatao", "nikalo", "delete karo"
+        - Update: "badlo", "change karo", "sudharo"
+
         RESPONSE GUIDELINES:
         - Always acknowledge what the user wants to do
         - Use tools when users mention specific task actions
-        - Provide helpful context and next steps
+        - Provide helpful context and next steps in user's language
         - If unsure, ask for clarification politely
         - Celebrate completed tasks with positive reinforcement
         - Suggest productivity tips when appropriate
 
         EXAMPLES OF GOOD RESPONSES:
         - "I'd be happy to help you add that task! Let me create it for you."
-        - "Great job completing that task! What would you like to work on next?"
-        - "I can show you your tasks. Would you like to see all tasks or just the pending ones?"
+        - "Mit bhaari! वह task complete हो गया! अगला क्या करें?"
+        - "Great! I'm showing you your pending tasks now."
+        - "Bilkul! Main vo task delete kar dunga!"
         
         Remember: You're here to make task management easier and more enjoyable for users!
         """
@@ -168,16 +182,46 @@ class TodoAgent:
             # Get the response text from the provider
             response_text = response.get("text", "")
 
+            # Enhance response with tool results data
+            enhanced_response = response_text
+            for tool_result in tool_results:
+                tool_name = tool_result.get("tool_name", "")
+                result = tool_result.get("result", {})
+                
+                # For list_tasks, include the actual task data
+                if tool_name == "list_tasks" and result.get("success"):
+                    tasks = result.get("tasks", [])
+                    if tasks:
+                        enhanced_response += "\n\nHere are your tasks:\n"
+                        for task in tasks:
+                            status = "[Done]" if task.get("completed") else "[Pending]"
+                            priority = task.get("priority", "medium")
+                            enhanced_response += f"  {status} Task {task.get('id')}: {task.get('title')} (Priority: {priority})\n"
+                    else:
+                        enhanced_response += "\n\nYou don't have any tasks yet."
+                
+                # For add_task, include confirmation with task ID
+                elif tool_name == "add_task" and result.get("success"):
+                    enhanced_response += f"\n\n[Task Created] ID: {result.get('task_id')} - {result.get('title')}"
+                
+                # For complete_task, include confirmation
+                elif tool_name == "complete_task" and result.get("success"):
+                    enhanced_response += f"\n\n[Task Completed] {result.get('message')}"
+                
+                # For delete_task, include confirmation
+                elif tool_name == "delete_task" and result.get("success"):
+                    enhanced_response += f"\n\n[Task Deleted] Task ID {tool_result.get('arguments', {}).get('task_id')} has been removed."
+
             # Ensure we always have a non-empty response
-            if not response_text or response_text.strip() == "":
+            if not enhanced_response or enhanced_response.strip() == "":
                 if user_message.lower() in ['hello', 'hi', 'hey']:
-                    response_text = "Hello! I'm your AI assistant. How can I help you with your tasks today?"
+                    enhanced_response = "Hello! I'm your AI assistant. How can I help you with your tasks today?"
                 else:
-                    response_text = "I received your message. How can I help you with your tasks?"
+                    enhanced_response = "I received your message. How can I help you with your tasks?"
 
             # Format the final response
             final_response = {
-                "response_text": response_text,
+                "response_text": enhanced_response,
                 "tool_results": tool_results,
                 "has_tools_executed": len(tool_results) > 0,
                 "user_id": user_id,

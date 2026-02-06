@@ -53,20 +53,24 @@ class AddTaskTool:
             # Create task repository
             task_repo = TaskRepository(session)
 
-            # Prepare task data
-            task_create = TaskCreate(
-                title=params.title,
-                description=params.description if params.description else None,
-                priority=params.priority if params.priority else "medium",
-                due_date=None
-            )
+            # Prepare task data - Don't include user_id here, it's handled by create_task
+            task_data = {
+                "title": params.title,
+                "description": params.description if params.description else None,
+                "priority": params.priority if params.priority else "medium",
+                "due_date": None,
+                "user_id": params.user_id  # Include it so TaskCreate validates it
+            }
 
             # Add due_date if provided
             if params.due_date:
                 from datetime import datetime
-                task_create.due_date = datetime.fromisoformat(params.due_date.replace('Z', '+00:00'))
+                task_data["due_date"] = datetime.fromisoformat(params.due_date.replace('Z', '+00:00'))
 
-            # Create the task
+            # Create TaskCreate object
+            task_create = TaskCreate(**task_data)
+
+            # Create the task (repository will handle user_id extraction)
             task = task_repo.create_task(task_create, params.user_id)
 
             return {
@@ -76,9 +80,50 @@ class AddTaskTool:
                 "message": f"Task '{task.title}' has been added successfully"
             }
 
-        except Exception as e:
+        except TypeError as e:
+            # Handle the user_id duplicate issue
+            if "user_id" in str(e):
+                # Try alternative approach - create task directly
+                try:
+                    from ..database.models import Task
+                    task = Task(
+                        title=params.title,
+                        description=params.description if params.description else None,
+                        priority=params.priority if params.priority else "medium",
+                        due_date=None,
+                        user_id=params.user_id
+                    )
+                    if params.due_date:
+                        from datetime import datetime
+                        task.due_date = datetime.fromisoformat(params.due_date.replace('Z', '+00:00'))
+                    
+                    session.add(task)
+                    session.commit()
+                    session.refresh(task)
+                    
+                    return {
+                        "success": True,
+                        "task_id": task.id,
+                        "title": task.title,
+                        "message": f"Task '{task.title}' has been added successfully"
+                    }
+                except Exception as e2:
+                    return {
+                        "success": False,
+                        "error": str(e2),
+                        "message": f"Failed to add task: {str(e2)}"
+                    }
             return {
                 "success": False,
                 "error": str(e),
-                "message": "Failed to add task. Please check your input and try again."
+                "message": f"Failed to add task: {str(e)}"
+            }
+        except Exception as e:
+            import traceback
+            print(f"DEBUG: Error in add_task: {str(e)}")
+            traceback.print_exc()
+            return {
+                "success": False,
+                "error": str(e),
+                "message": f"Failed to add task: {str(e)}"
             }

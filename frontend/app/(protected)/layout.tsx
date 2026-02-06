@@ -1,36 +1,18 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Navbar } from "@/components/Navbar";
 import ClientWrapper from "@/components/ClientWrapper";
 import { User } from "@/types/user";
 
 export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    // Mock user session for now
-    const mockUser = {
-      id: "1",
-      email: "user@example.com",
-      displayName: "User"
-    };
-    
-    setUser(mockUser);
-    setLoading(false);
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div>Loading...</div>
-      </div>
-    );
-  }
+  // Mock user session for now - initialized synchronously
+  const [user] = useState<User | null>({
+    id: "1",
+    email: "user@example.com",
+    displayName: "User"
+  });
 
   return (
     <div className="min-h-screen">

@@ -28,6 +28,12 @@ print(f"Routes after API: {len(app.routes)}")
 # Import and include AI chatbot routes after the main app is set up
 # This ensures the same authentication context is used
 try:
+    import sys
+    import os
+    # Add the backend directory to sys.path to enable absolute imports
+    backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if backend_dir not in sys.path:
+        sys.path.insert(0, backend_dir)
     from ai_chatbot.api.chat_endpoint import router as chat_router
     app.include_router(chat_router, prefix="/api/v1", tags=["chat"])
     print("Chat router included")
